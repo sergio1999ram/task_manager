@@ -1,4 +1,6 @@
-
-
-class User():
-    pass
+user = {
+    "fullname": "",
+    "email": "",
+    "username": "",
+    "password": ""
+}

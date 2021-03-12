@@ -3,7 +3,7 @@ from wtforms import StringField, ValidationError, PasswordField
 from wtforms import validators
 from wtforms.fields.html5 import EmailField
 
-from models import User
+from models import user
 
 
 class RegisterForm(FlaskForm):
@@ -28,7 +28,7 @@ class RegisterForm(FlaskForm):
                             render_kw={'style': 'clear:both; width:100%'})
 
     def validate_email(forms, field):
-        user = User.query.filter_by(email=field.data).first()
+        user = db.user
         if user:
             raise ValidationError('Email already in use')
         if '@' not in field.data:
