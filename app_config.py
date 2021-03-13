@@ -18,7 +18,7 @@ csrf.init_app(app)
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
-client = pymongo.MongoClient(os.getenv('DATABASE_URL'))
+client = pymongo.MongoClient(os.environ.get('DATABASE_URL'))
 db = client.test
 
-app.config['SECRET_KEY'] = os.getenv('SECRETKEY')
+app.config['SECRET_KEY'] = os.enviro.get('SECRETKEY')
