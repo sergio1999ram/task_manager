@@ -3,7 +3,7 @@ from json import encoder
 from flask import render_template, request, redirect, url_for, flash, session
 from flask_login import login_required, login_user, current_user, logout_user
 
-from app_config import app, db, login_manager
+from app_config import app, db, login_manager, bcrypt
 from forms.login import LoginForm
 from forms.register import RegisterForm
 from model.user import User
@@ -25,14 +25,14 @@ def login():
             password = form.password.data
             # JSON object
             user = db.users.find_one({"username": username})
+
             if user:
-                if username == user["username"] and password == user["password"]:
+                if username == user["username"] and bcrypt.check_password_hash(user["password"], password):
                     # model_user for login reasons
                     model_user = User(user_json=user)
                     # Printing JSON object
                     session["username"] = user["username"]
                     session["fullname"] = user["fullname"]
-                    print(session["username"])
                     login_user(model_user)
                     flash('Login successful')
                     return redirect(url_for('tasks'))
@@ -53,11 +53,14 @@ def register():
     form = RegisterForm(request.form)
     if request.method == 'POST':
         if form.validate_on_submit():
+            pw_hashed = bcrypt.generate_password_hash(form.password.data)
+            print(f'Password: {form.password.data}')
+            print(f'Hashed: {pw_hashed}')
             user = {
                 "fullname": form.fullname.data,
                 "email": form.email.data,
                 "username": form.username.data,
-                "password": form.password.data
+                "password": pw_hashed
             }
             db.users.insert_one(user)
             return redirect(url_for('home'))
@@ -67,6 +70,8 @@ def register():
 @app.route('/contact')
 def contact():
     return render_template('under_construction.html')
+
+
 @app.route('/user/tasks')
 @login_required
 def tasks():
@@ -75,7 +80,7 @@ def tasks():
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User(db.users.find_one({"user_id": user_id}))
+    return User(db.users.find_one({"username": user_id}))
 
 
 if __name__ == '__main__':
