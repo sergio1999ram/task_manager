@@ -21,4 +21,4 @@ login_manager.login_view = "login"
 client = pymongo.MongoClient(os.environ.get('DATABASE_URL'))
 db = client.test
 
-app.config['SECRET_KEY'] = os.enviro.get('SECRETKEY')
+app.config['SECRET_KEY'] = os.environ.get('SECRETKEY')
