@@ -1,2 +1,11 @@
+<div class="container-fluid">
+    <div class="container m">
+        {%if total_users == 1: %}
+        <small class="d-flex justify-content-center">{{ total_users }} usuario registrado</small>
+        {%else:%}
+        <small class="d-flex justify-content-center">{{ total_users }} usuarios registrados</small>
+        {%endif%}
+    </div>
+</div>
 </body>
 </html>

@@ -11,7 +11,8 @@ from model.user import User
 
 @app.route('/')
 def home():
-    return render_template('home.html')
+    total_users = db.users.count_documents({})
+    return render_template('home.html', total_users=total_users)
 
 
 @app.route('/login', methods=['GET', 'POST'])

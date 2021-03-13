@@ -1,5 +1,39 @@
 {%with title='Home'%}
 {%include 'resources/header.html'%}
 {%endwith%}
+{% if current_user.is_authenticated: %}
 <h3>Home view</h3>
+{% else: %}
+<div class="container-fluid" style="background-color: #EED5C2">
+    <div class="row container m-auto">
+        <div class="col-6"></div>
+        <div class="col-6 p-3">
+            <div class="container-fluid">
+                <h3 class="text-end">Hola!</h3>
+                <p class="text-justify text-end">Task Manager es una aplicación donde podrás anotar las tareas que
+                    necesites
+                    completar con
+                    tan solo unos pasos. Podrás marcarla como completada y editarla si fuera necesario! La aplicación la
+                    puedes
+                    usar para anotar las tareas de tu entorno laboral, académico o incluso metas personales; podrás
+                    acceder
+                    desde cualquier equipo ajeno al tuyo para observar tus metas pendientes sin ningún problema!</p>
+            </div>
+            <div class="container-fluid">
+                <p class="text-justify text-end">A la fecha, la aplicación se encuentra en desarrollo aún (Solo hay una
+                    persona detrás del sistema); pero en unos días la aplicación tendrá sus funcionalidades principales
+                    ya implementadas. Y como toda aplicación, seguirá en crecimiento! </p>
+            </div>
+            <div class="container-fluid">
+                <a href="{{ url_for('register') }}" class="d-flex justify-content-end">
+                    <button class="btn btn-success">Regístrate aquí!</button>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{%endif%}
+
+{%with total=total_users%}
 {%include 'resources/footer.html'%}
+{%endwith%}
