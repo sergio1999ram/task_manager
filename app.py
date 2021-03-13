@@ -1,7 +1,8 @@
-from app_config import app, db, csrf
 from flask import render_template, request, redirect, url_for
+
+from app_config import app, db
 from forms.register import RegisterForm
-import jsonify
+
 
 @app.route('/')
 def home():
@@ -26,5 +27,3 @@ def register():
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8080)
-
-
