@@ -34,7 +34,6 @@ def login():
                     session["username"] = user["username"]
                     session["fullname"] = user["fullname"]
                     login_user(model_user)
-                    flash('Login successful')
                     return redirect(url_for('tasks'))
             else:
                 errors.append('Username or password incorrect')
@@ -63,7 +62,9 @@ def register():
                 "password": pw_hashed
             }
             db.users.insert_one(user)
-            return redirect(url_for('home'))
+            model_user = User(user_json=user)
+            login_user(model_user)
+            return redirect(url_for('tasks'))
     return render_template('user_related/register.html', form=form)
 
 
