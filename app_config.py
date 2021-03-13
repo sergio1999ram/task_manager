@@ -14,4 +14,4 @@ csrf.init_app(app)
 client = pymongo.MongoClient(os.getenv('DATABASE_URL'))
 db = client.test
 
-app.config['SECRET_KEY'] = os.urandom(32)
+app.config['SECRET_KEY'] = os.getenv('SECRETKEY')
