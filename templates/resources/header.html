@@ -16,4 +16,32 @@
     <link href="https://fonts.googleapis.com/css2?family=Recursive:wght@300;400&family=Roboto:wght@100;300&display=swap"
           rel="stylesheet">
 </head>
-<body>
+
+<div class="d-flex bg-dark">
+    <nav class="nav" style="width:15%">
+        <div style="margin: auto 0"><a href="{{ url_for('home') }}" class="nav-link active text-white"
+                                       style="font-family:Roboto; font-weight: 300; font-size:14px">Home</a></div>
+        <div style="margin: auto 0">
+            <a href="{{ url_for('contact') }}" class="nav-link text-white"
+               style="font-family:Roboto; font-weight:300; font-size: 14px">Contact</a>
+        </div>
+    </nav>
+    <nav class="nav justify-content-end" style="width:85%">
+        {% if current_user.is_authenticated: %}
+        <div style="margin: auto 0">
+            <a href="{{url_for('tasks')}}" class="nav-link mx-2"
+               style="font-family:Roboto; font-weight: 300; font-size:14px">{{ session["fullname"] }}'s Profile</a>
+        </div>
+        <a href="{{ url_for('logout') }}" class="nav-link">Log Out</a>
+        {% else: %}
+        <div style="margin: auto 0">
+            <a href="{{ url_for('login') }}" class="nav-link mx-2 text-white"
+               style="font-family:Roboto; font-weight: 300; font-size:14px">Log In</a>
+        </div>
+        <div style="margin: auto 0">
+            <a href="{{ url_for('register') }}" class="nav-link mx-2 text-white"
+               style="font-family:Roboto; font-weight: 300; font-size:14px">Register</a>
+        </div>
+        {% endif %}
+    </nav>
+</div>
