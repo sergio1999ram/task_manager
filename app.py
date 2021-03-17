@@ -1,18 +1,23 @@
-from json import encoder
-
-from flask import render_template, request, redirect, url_for, flash, session
-from flask_login import login_required, login_user, current_user, logout_user
+from flask import render_template, request, redirect, url_for, session, jsonify
+from flask_login import login_required, login_user, logout_user, current_user
 
 from app_config import app, db, login_manager, bcrypt
 from forms.login import LoginForm
 from forms.register import RegisterForm
+from forms.task import TaskForm
 from model.user import User
 
 
 @app.route('/')
 def home():
-    total_users = db.users.count_documents({})
-    return render_template('home.html', total_users=total_users)
+    form = TaskForm(request.form)
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            if current_user.is_authenticated:
+                return 'Tasks from db'
+            else:
+                return 'Tasks from session'
+    return render_template('home.html', form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -34,7 +39,7 @@ def login():
                     session["username"] = user["username"]
                     session["fullname"] = user["fullname"]
                     login_user(model_user)
-                    return redirect(url_for('tasks'))
+                    return redirect(url_for('home'))
             else:
                 errors.append('Username or password incorrect')
     return render_template('user_related/login.html', form=form, errors=errors)
@@ -44,6 +49,8 @@ def login():
 @login_required
 def logout():
     logout_user()
+    session.pop("fullname", None)
+    session.pop("username", None)
     return redirect(url_for('home'))
 
 
@@ -64,19 +71,9 @@ def register():
             db.users.insert_one(user)
             model_user = User(user_json=user)
             login_user(model_user)
+            session["username"] = user["username"]
             return redirect(url_for('tasks'))
     return render_template('user_related/register.html', form=form)
-
-
-@app.route('/contact')
-def contact():
-    return render_template('under_construction.html')
-
-
-@app.route('/user/tasks')
-@login_required
-def tasks():
-    return render_template('tasks.html', user=db.users.find_one({"username": session["username"]}))
 
 
 @login_manager.user_loader

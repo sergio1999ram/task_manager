@@ -1,4 +1,8 @@
-{%with title='Dashboard'%}
-{%include 'resources/header.html'%}
-{%endwith%}
-<h3>dashboard</h3>
+{%extends 'resources/base.html'%}
+{%block title%}Dashboard{%endblock%}
+<div class="row">
+    <form method="POST">
+        {{form.title.label}}
+        {{form.title}}
+    </form>
+</div>

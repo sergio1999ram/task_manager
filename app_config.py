@@ -16,7 +16,6 @@ login_manager = LoginManager()
 bcrypt = Bcrypt(app)
 csrf.init_app(app)
 login_manager.init_app(app)
-login_manager.login_view = "login"
 
 client = pymongo.MongoClient(os.environ.get('DATABASE_URL'))
 db = client.test

@@ -1,6 +1,6 @@
-{%with title='Register for FREE!'%}
-{%include 'resources/header.html'%}
-{%endwith%}
+{%extends 'resources/base.html' %}
+{%block title%}Log In{%endblock%}
+{%block content %}
 <div class="container-fluid">
     <div class="row vh-100">
         <div class="col-3"></div>
@@ -32,11 +32,16 @@
                     <button type="submit" class="mx-auto">Register</button>
                 </div>
             </form>
-            <div style="margin-top:10px" class="d-flex flex-column align-items-center w-25">
+            <div style="margin-top:10px" class="d-flex flex-column align-items-center">
                 <div class="text-start">
                     {% for field, errors in form.errors.items() %}
                     <div>
                         <small class="text-danger">{{ "\n".join(errors) }}</small>
+                    </div>
+                    {% endfor %}
+                    {% for error in errors %}
+                    <div>
+                        <small class="text-danger">{{ error }}</small>
                     </div>
                     {% endfor %}
                 </div>
@@ -45,5 +50,4 @@
         <div class="col-3"></div>
     </div>
 </div>
-</body>
-</html>
+{%endblock%}
