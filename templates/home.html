@@ -7,8 +7,9 @@
 {%block content%}
 <div class="container-fluid">
     <div class="container-fluid row d-flex justify-content-center align-items-center">
-        <div class="col-4">
+        <div class="col-5">
             <form method="POST" class="w-100 border border-2 p-4 my-3">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <h3>Add Task</h3>
                 <ol>
                     <li>
@@ -20,18 +21,38 @@
                         {{form.description(class_="form-control")}}
                     </li>
                     <button type="submit" class="btn btn-success">Save</button>
+                    {% for field, errors in form.errors.items() %}
+                    <div>
+                        <small class="text-danger">{{ "\n".join(errors) }}</small>
+                    </div>
+                    {% endfor %}
                 </ol>
             </form>
         </div>
-        <div class="col-8   ">
-            <div class="w-100 border border-2 p-4">
-                <ul>
+        <div class="col-7">
+            <div class="w-100 p-4">
+                <div class="m-0 p-0 list-group">
                     {%if current_user.is_authenticated%}
-                    <li>Tasks from db</li>
+                    {%if db.users.find_one( {'username': session['username'] })["tasks"]|length < 1 %}
+                    <div class="mx-2">No tasks to show</div>
+                    {%else%}
+                    {%for task in db.users.find_one( {"username": session["username"]})["tasks"] %}
+                    <div class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{task.title}}</h5>
+                        </div>
+                        <p class="mb-1 w-75">{{task.description}}</p>
+                        <div>
+                            <img src="{{ url_for('static', filename='icons/pencil-square.svg') }}" width=24/>
+                            <img src="{{ url_for('static', filename='icons/check-circle.svg') }}" width=24/>
+                        </div>
+                    </div>
+                    {%endfor%}
+                    {%endif%}
                     {%else%}
                     <li>Tasks from session</li>
                     {%endif%}
-                </ul>
+                </div>
             </div>
         </div>
     </div>

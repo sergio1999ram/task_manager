@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, session, jsonify
+from flask import render_template, request, redirect, url_for, session
 from flask_login import login_required, login_user, logout_user, current_user
 
 from app_config import app, db, login_manager, bcrypt
@@ -8,16 +8,20 @@ from forms.task import TaskForm
 from model.user import User
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def home():
     form = TaskForm(request.form)
     if request.method == 'POST':
         if form.validate_on_submit():
+            task = {
+                "title": form.title.data,
+                "description": form.description.data
+            }
             if current_user.is_authenticated:
-                return 'Tasks from db'
-            else:
-                return 'Tasks from session'
-    return render_template('home.html', form=form)
+                db.users.update_one({"username": session["username"]}, {'$push': {'tasks': task}})
+                return redirect(url_for('home'))
+
+    return render_template('home.html', form=form, db=db)
 
 
 @app.route('/login', methods=['GET', 'POST'])
