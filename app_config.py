@@ -1,3 +1,4 @@
+import datetime
 import os
 
 import pymongo
@@ -12,8 +13,6 @@ load_dotenv('.env')
 app = Flask(__name__)
 csrf = CSRFProtect()
 login_manager = LoginManager()
-session.permanent = False
-
 bcrypt = Bcrypt(app)
 csrf.init_app(app)
 login_manager.init_app(app)
