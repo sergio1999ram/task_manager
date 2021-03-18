@@ -20,7 +20,19 @@ def home():
                 "description": form.description.data
             }
             if current_user.is_authenticated:
-                task["task_id"] = len(db.users.find_one({"username": session["username"]})["tasks"]) + 1
+                if "max_id" not in session:
+                    session["max_id"] = 0
+                print("User authenticated")
+                if list(db.users.aggregate(
+                        [{"$project": {"username": session["username"], "max_id": {"$max": "$tasks.task_id"}}}]))[0][
+                    "max_id"] is None:
+                    session["max_id"] = 1
+                    task["task_id"] = session["max_id"]
+                else:
+                    id = session["max_id"]
+                    task["task_id"] = id + 1
+                    session["max_id"] = id + 1
+                print(session["max_id"])
                 db.users.update_one({"username": session["username"]}, {'$push': {'tasks': task}})
                 return redirect(url_for('home'))
             else:
@@ -28,9 +40,12 @@ def home():
                     session["tasks"] = []
                 else:
                     tasks = session["tasks"]
+                    print(f'session["tasks"]: {session["tasks"]}')
                     tasks.append(task)
                     session["tasks"] = tasks
+                    print(f'session["tasks"]: {session["tasks"]}')
                     return redirect(url_for('home'))
+
     return render_template('home.html', form=form, db=db)
 
 
@@ -38,6 +53,7 @@ def home():
 def login():
     form = LoginForm(request.form)
     errors = []
+
     if request.method == 'POST':
         if form.validate_on_submit():
             username = form.username.data
@@ -63,8 +79,6 @@ def login():
 @login_required
 def logout():
     logout_user()
-    session.pop("fullname", None)
-    session.pop("username", None)
     return redirect(url_for('home'))
 
 
@@ -85,8 +99,6 @@ def register():
             }
             db.users.insert_one(user)
             model_user = User(user_json=user)
-            login_user(model_user)
-            session["username"] = user["username"]
             return redirect(url_for('home'))
     return render_template('user_related/register.html', form=form)
 
@@ -96,6 +108,7 @@ def delete_task(id):
     db.users.update_one({'username': session["username"], 'tasks.task_id': id},
                         {'$pull': {"tasks": {'task_id': id}}})
     return redirect(url_for('home'))
+
 
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
 def edit_task(id):
@@ -115,11 +128,11 @@ def edit_task(id):
 
     if request.method == 'POST':
         if form.validate_on_submit():
-            db.users.update_one({'username': session["username"], 'tasks.task_id': task_id},
-                                {'$set': {f'tasks.{task_id - 1}.title': form.title.data,
-                                          f'tasks.{task_id - 1}.description': form.description.data}})
+            db.users.update_one({'username': session["username"], 'tasks.task_id': id},
+                                {'$set': {"tasks.$.title": form.title.data,
+                                          "tasks.$.description": form.description.data}})
             return redirect(url_for('home'))
-    return render_template('task/edit_task.html', form=form, task_id=task_id)
+    return render_template('task/edit_task.html', form=form, task_id=id)
 
 
 @app.route('/complete/<int:id>')
