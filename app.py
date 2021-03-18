@@ -130,6 +130,7 @@ def complete_task(id):
     else:
         tasks = session["tasks"]
         tasks.pop(id)
+        session["tasks"] = tasks
     return redirect(url_for('home'))
 
 

@@ -62,7 +62,7 @@
                     {%else%}
                     {%if "tasks" in session%}
 
-                    {%if session["tasks"]|length > 1%}
+                    {%if session["tasks"]|length > 0%}
                     {%for i in range(session["tasks"]|length)%}
                     <div class="list-group-item list-group-item-action">
                         <div class="d-flex w-100 justify-content-between">
