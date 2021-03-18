@@ -1,7 +1,7 @@
-from flask import render_template, request, redirect, url_for, session
+from flask import render_template, request, redirect, url_for
 from flask_login import login_required, login_user, logout_user, current_user
 
-from app_config import app, db, login_manager, bcrypt
+from app_config import app, db, login_manager, bcrypt, session
 from forms.login import LoginForm
 from forms.register import RegisterForm
 from forms.task import TaskForm

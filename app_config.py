@@ -2,7 +2,7 @@ import os
 
 import pymongo
 from dotenv import load_dotenv
-from flask import Flask
+from flask import Flask, session
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
@@ -12,6 +12,7 @@ load_dotenv('.env')
 app = Flask(__name__)
 csrf = CSRFProtect()
 login_manager = LoginManager()
+session.permanent = False
 
 bcrypt = Bcrypt(app)
 csrf.init_app(app)
