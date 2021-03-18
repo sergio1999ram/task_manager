@@ -5,12 +5,14 @@ from app_config import app, db, login_manager, bcrypt
 from forms.login import LoginForm
 from forms.register import RegisterForm
 from forms.task import TaskForm
+from model.task import Task
 from model.user import User
 
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
     form = TaskForm(request.form)
+
     if request.method == 'POST':
         if form.validate_on_submit():
             task = {
@@ -18,9 +20,17 @@ def home():
                 "description": form.description.data
             }
             if current_user.is_authenticated:
+                task["task_id"] = len(db.users.find_one({"username": session["username"]})["tasks"]) + 1
                 db.users.update_one({"username": session["username"]}, {'$push': {'tasks': task}})
                 return redirect(url_for('home'))
-
+            else:
+                if "tasks" not in session:
+                    session["tasks"] = []
+                else:
+                    tasks = session["tasks"]
+                    tasks.append(task)
+                    session["tasks"] = tasks
+                    return redirect(url_for('home'))
     return render_template('home.html', form=form, db=db)
 
 
@@ -41,7 +51,7 @@ def login():
                     model_user = User(user_json=user)
                     # Printing JSON object
                     session["username"] = user["username"]
-                    session["fullname"] = user["fullname"]
+                    session["name"] = user["fullname"].split()
                     login_user(model_user)
                     return redirect(url_for('home'))
             else:
@@ -70,14 +80,57 @@ def register():
                 "fullname": form.fullname.data,
                 "email": form.email.data,
                 "username": form.username.data,
-                "password": pw_hashed
+                "password": pw_hashed,
+                "tasks": []
             }
             db.users.insert_one(user)
             model_user = User(user_json=user)
             login_user(model_user)
             session["username"] = user["username"]
-            return redirect(url_for('tasks'))
+            return redirect(url_for('home'))
     return render_template('user_related/register.html', form=form)
+
+
+@app.route('/delete/<int:id>', methods=['GET', 'POST'])
+def delete_task(id):
+    db.users.update_one({'username': session["username"], 'tasks.task_id': id},
+                        {'$pull': {"tasks": {'task_id': id}}})
+    return redirect(url_for('home'))
+
+@app.route('/edit/<int:id>', methods=['GET', 'POST'])
+def edit_task(id):
+    user = db.users.find_one({"username": session["username"]})
+    task = None
+    task_id = None
+    for item in list(user["tasks"]):
+        if id == item["task_id"]:
+            task = {
+                'title': item["title"],
+                'description': item["description"]
+            }
+            task_id = item["task_id"]
+    print(task_id)
+    task_model = Task(task_json=task)
+    form = TaskForm(obj=task_model)
+
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            db.users.update_one({'username': session["username"], 'tasks.task_id': task_id},
+                                {'$set': {f'tasks.{task_id - 1}.title': form.title.data,
+                                          f'tasks.{task_id - 1}.description': form.description.data}})
+            return redirect(url_for('home'))
+    return render_template('task/edit_task.html', form=form, task_id=task_id)
+
+
+@app.route('/complete/<int:id>')
+def complete_task(id):
+    if current_user.is_authenticated:
+        db.users.update_one({'username': session["username"], 'tasks.task_id': id},
+                            {'$pull': {"tasks": {'task_id': id}}})
+    else:
+        tasks = session["tasks"]
+        tasks.pop(id)
+    return redirect(url_for('home'))
 
 
 @login_manager.user_loader

@@ -1,0 +1,35 @@
+{%extends 'resources/base.html'%}
+{%block title%}Edit Task - {{task_id}} {%endblock%}
+{%block styles%}<link rel="stylesheet" href="{{ url_for('static', filename='stylesheet/home.css') }}"/>{%endblock%}
+{%block content%}
+<div class="container-fluid">
+    <div class="container-fluid row d-flex">
+        <div class="col-5">
+            <form method="POST" class="w-100 border border-2 p-4 mt-3">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <h3>Add Task</h3>
+                <ol>
+                    <li>
+                        {{form.title.label}}
+                        {{form.title(class_="form-control")}}
+                    </li>
+                    <li>
+                        {{form.description.label}}
+                        {{form.description(class_="form-control")}}
+                    </li>
+                    <button type="submit" class="btn btn-success">Save</button>
+                    {% for field, errors in form.errors.items() %}
+                    <div>
+                        <small class="text-danger">{{ "\n".join(errors) }}</small>
+                    </div>
+                    {% endfor %}
+                </ol>
+            </form>
+            {%if not current_user.is_authenticated%}
+            <small class="text-danger p-0 m-0">If you close your browser, you will lose all your notes.</small>
+            {%endif%}
+        </div>
+    </div>
+</div>
+
+{%endblock%}

@@ -6,9 +6,9 @@
 
 {%block content%}
 <div class="container-fluid">
-    <div class="container-fluid row d-flex justify-content-center align-items-center">
+    <div class="container-fluid row d-flex">
         <div class="col-5">
-            <form method="POST" class="w-100 border border-2 p-4 my-3">
+            <form method="POST" class="w-100 border border-2 p-4 mt-3">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <h3>Add Task</h3>
                 <ol>
@@ -28,29 +28,59 @@
                     {% endfor %}
                 </ol>
             </form>
+            {%if not current_user.is_authenticated%}
+            <small class="text-danger p-0 m-0">If you close your browser, you will lose all your notes.</small>
+            {%endif%}
         </div>
         <div class="col-7">
-            <div class="w-100 p-4">
-                <div class="m-0 p-0 list-group">
+            <div class="w-100 p-4 h-100">
+                <div class="m-0 p-0 overflow-auto" style="height:600px">
                     {%if current_user.is_authenticated%}
+
                     {%if db.users.find_one( {'username': session['username'] })["tasks"]|length < 1 %}
                     <div class="mx-2">No tasks to show</div>
                     {%else%}
                     {%for task in db.users.find_one( {"username": session["username"]})["tasks"] %}
                     <div class="list-group-item list-group-item-action">
+                        <small class="p-0 m-0"><strong>#{{task.task_id}}</strong></small>
                         <div class="d-flex w-100 justify-content-between">
                             <h5 class="mb-1">{{task.title}}</h5>
                         </div>
                         <p class="mb-1 w-75">{{task.description}}</p>
                         <div>
-                            <img src="{{ url_for('static', filename='icons/pencil-square.svg') }}" width=24/>
-                            <img src="{{ url_for('static', filename='icons/check-circle.svg') }}" width=24/>
+                            <a href="/edit/{{task.task_id}}"><img
+                                    src="{{ url_for('static', filename='icons/pencil-square.svg') }}" width=24/></a>
+                            <a href="/complete/{{task.task_id}}"><img
+                                    src="{{ url_for('static', filename='icons/check-circle.svg') }}" width=24/></a>
+                            <a href="/delete/{{task.task_id}}"><img
+                                    src="{{ url_for('static', filename='icons/trash.svg') }}" width=24/></a>
                         </div>
                     </div>
                     {%endfor%}
                     {%endif%}
+
                     {%else%}
-                    <li>Tasks from session</li>
+                    {%if "tasks" in session%}
+
+                    {%if session["tasks"]|length > 1%}
+                    {%for i in range(session["tasks"]|length)%}
+                    <div class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{session["tasks"][i].title}}</h5>
+                        </div>
+                        <p class="mb-1 w-75">{{session["tasks"][i].description}}</p>
+                        <div>
+                            <a href="/complete/{{i}}"><img
+                                    src="{{ url_for('static', filename='icons/check-circle.svg') }}" width=24/></a>
+                        </div>
+                    </div>
+                    {%endfor%}
+
+                    {%else%}
+                    <div class="mx-2">No tasks to show</div>
+                    {%endif%}
+
+                    {%endif%}
                     {%endif%}
                 </div>
             </div>

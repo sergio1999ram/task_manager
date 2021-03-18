@@ -10,14 +10,11 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.0/font/bootstrap-icons.css">
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.gstatic.com">
-    <!-- Roboto -->
-    <link href="https://fonts.googleapis.com/css2?family=Recursive:wght@300;400&family=Roboto:wght@100;300&display=swap"
-          rel="stylesheet">
     <!-- Lemonada -->
     <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300;400;500;600&display=swap" rel="stylesheet">
     {%block styles%}{%endblock%}
 </head>
-<body>
+<body class="overflow-hidden">
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid d-flex justify-content-start">
         <ul class="navbar-nav mb-2 mb-lg-0">
@@ -29,18 +26,41 @@
 
     <div class="container-fluid d-flex justify-content-end">
         <ul class="navbar-nav mb-2 mb-lg-0">
+            {% if current_user.is_authenticated %}
             <li class="nav-item">
+                <div class="dropdown">
+                    <button class="btn px-2 py-1 btn-light dropdown-toggle" type="button" id="dropdownMenuButton1"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                        {{session["name"][0]}}'s Profile
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton1">
+                        <li><a class="dropdown-item" href="#">Edit my profile</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a></li>
+                    </ul>
+                </div>
+            </li>
+            {%else%}
+            <li class="nav-item mx-2">
                 <a class="nav-link" href="{{ url_for('login') }}">Log In</a>
             </li>
-            <li class="nav-item">
-                <button class="btn p-0">
+            <li class="nav-item mx-2">
+                <button class="btn m-0 p-0 btn-danger">
                     <a class="nav-link" href="{{ url_for('register') }}">Register</a>
                 </button>
             </li>
+
+            {%endif%}
         </ul>
     </div>
 </nav>
+
 {%block content %}{%endblock%}
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0"
+        crossorigin="anonymous"></script>
 </body>
 </html>
